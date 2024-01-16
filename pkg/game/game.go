@@ -4,6 +4,7 @@ import (
     "os"
     "wordle-cli/pkg/dictionary"
     "wordle-cli/pkg/term"
+    "time"
 )
 
 type gameStatusEnum int
@@ -25,7 +26,9 @@ var gameStatus gameStatusEnum
 func Play() {
     magicWord = dictionary.GetWordOfDay()
 
+    currentTime := time.Now()
     term.Println("Welcome to Wordle")
+    term.Println("Today is: %s", currentTime.Format("January 2, 2006"))
     term.Println("Options = [ 1 : Quit ]")
     term.Println("")
 
@@ -47,12 +50,12 @@ func Play() {
 
 func nextPress(row int, col int) (int, int) {
     var key [1]byte
-	_, err := os.Stdin.Read(key[:])
-	if err != nil {
+    _, err := os.Stdin.Read(key[:])
+    if err != nil {
         term.Println("Key press error: %s", err)
         gameStatus = EXITING
-		return row, col
-	}
+        return row, col
+    }
 
     kp := rune(key[0])
 
@@ -104,7 +107,7 @@ func renderState(row int) {
     }
 
     for i, word := range gameState {
-		for j, letter := range word {
+        for j, letter := range word {
             if letter == 0 {
                 term.Print(" [ ]")
             } else if i >= row {
@@ -116,9 +119,9 @@ func renderState(row int) {
             } else {
                 term.PrintColored(term.RED, " [%c]", letter)
             }
-		}
-		term.Println("")
-	}
+        }
+        term.Println("")
+    }
 
     if gameStatus == WON || gameStatus == LOST {
         term.MoveCursorDown(1)

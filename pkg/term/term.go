@@ -2,8 +2,8 @@ package term
 
 import (
     "fmt"
-	"golang.org/x/term"
-	"os"
+    "golang.org/x/term"
+    "os"
     "bufio"
 )
 
@@ -27,7 +27,7 @@ var oldState *term.State
 
 func Configure() (err error) {
     fd := int(os.Stdin.Fd())
-	oldState, err = term.MakeRaw(fd)
+    oldState, err = term.MakeRaw(fd)
 
     if err != nil {
         return err
@@ -40,7 +40,7 @@ func Configure() (err error) {
 
 func Restore() {
     fd := int(os.Stdin.Fd())
-	term.Restore(fd, oldState)
+    term.Restore(fd, oldState)
 }
 
 func Println(format string, a ...interface{}) {

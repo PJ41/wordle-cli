@@ -2,10 +2,10 @@ package dictionary
 
 import (
     "bufio"
-	"os"
+    "os"
     "path/filepath"
-	"runtime"
-	"time"
+    "runtime"
+    "time"
 
 )
 
@@ -29,11 +29,11 @@ func init() {
 }
 
 func GetWordOfDay() string {
-	durationSinceEpoch := time.Since(time.Unix(0, 0))
-	daysSinceEpoch := int(durationSinceEpoch.Hours() / 24)
+    durationSinceEpoch := time.Since(time.Unix(0, 0))
+    daysSinceEpoch := int(durationSinceEpoch.Hours() / 24)
 
     index := daysSinceEpoch % len(keys) 
-	return keys[index]
+    return keys[index]
 }
 
 func IsValidGuess(guess string) bool {
@@ -46,28 +46,28 @@ func loadWordsIntoMap(theMap map[string]bool, fileName string) {
     }
 
     _, currentFile, _, _ := runtime.Caller(0)
-	dir := filepath.Dir(currentFile)
+    dir := filepath.Dir(currentFile)
 
     filePath := filepath.Join(dir, "words", fileName)
 
     file, err := os.Open(filePath); 
-	if err != nil {
+    if err != nil {
         InitializationError = err
         return 
-	}
-	defer file.Close()
+    }
+    defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		theMap[line] = true
+    scanner := bufio.NewScanner(file)
+    for scanner.Scan() {
+        line := scanner.Text()
+        theMap[line] = true
 
         if fileName == answersFileName {
             keys = append(keys, line)
         }
-	}
+    }
 
-	if err := scanner.Err(); err != nil {
+    if err := scanner.Err(); err != nil {
         InitializationError = err
-	}
+    }
 }
