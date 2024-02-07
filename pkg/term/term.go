@@ -11,14 +11,12 @@ type Color int
 
 const (
     DEFAULT Color = iota
-    RED
     GREEN
     YELLOW
 )
 
 var colorMap = map[Color]string {
     DEFAULT : "\033[0m",
-    RED : "\033[31m",
     GREEN : "\033[32m",
     YELLOW : "\033[33m",
 }

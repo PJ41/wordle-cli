@@ -6,7 +6,7 @@ import (
     "path/filepath"
     "runtime"
     "time"
-
+    "strings"
 )
 
 var InitializationError error
@@ -33,10 +33,11 @@ func GetWordOfDay() string {
     daysSinceEpoch := int(durationSinceEpoch.Hours() / 24)
 
     index := daysSinceEpoch % len(keys) 
-    return keys[index]
+    return strings.ToUpper(keys[index])
 }
 
 func IsValidGuess(guess string) bool {
+    guess = strings.ToLower(guess)
     return answers[guess] || nonAnswers[guess]
 }
 

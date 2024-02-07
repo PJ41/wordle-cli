@@ -5,6 +5,7 @@ import (
     "wordle-cli/pkg/dictionary"
     "wordle-cli/pkg/term"
     "time"
+    "unicode"
 )
 
 type gameStatusEnum int
@@ -64,6 +65,7 @@ func nextPress(row int, col int) (int, int) {
     } else if gameStatus == WON || gameStatus == LOST {
         return row, col
     } else if isLetter(kp) && col < wordLen {
+        kp = unicode.ToUpper(kp)
         gameState[row][col] = kp
         col++
     } else if isDelete(kp) && col > 0 {
@@ -107,6 +109,13 @@ func renderState(row int) {
     }
 
     for i, word := range gameState {
+        yellows := make(map[rune]int)
+        for j, letter := range magicWord {
+            if letter != word[j] {
+                yellows[letter]++
+            }
+        }
+
         for j, letter := range word {
             if letter == 0 {
                 term.Print(" [ ]")
@@ -114,10 +123,11 @@ func renderState(row int) {
                 term.Print(" [%c]", letter)
             } else if letter == rune(magicWord[j]) {
                 term.PrintColored(term.GREEN, " [%c]", letter)
-            } else if magicWordContains(letter) {
+            } else if yellows[letter] > 0 {
+                yellows[letter]--
                 term.PrintColored(term.YELLOW, " [%c]", letter)
             } else {
-                term.PrintColored(term.RED, " [%c]", letter)
+                term.Print(" [%c]", letter)
             }
         }
         term.Println("")
@@ -128,15 +138,6 @@ func renderState(row int) {
     }
 
     term.Flush()
-}
-
-func magicWordContains(r rune) bool {
-    for _, letter := range magicWord {
-        if r == letter {
-            return true
-        }
-    }
-    return false
 }
 
 func reRenderState(row int) {
