@@ -9,8 +9,6 @@ import (
     "strings"
 )
 
-var InitializationError error
-
 const answersLineCount = 2315
 const answersFileName string = "wordle-answers-shuffled.txt"
 const nonAnswersFileName string = "wordle-non-answers-sorted.txt"
@@ -19,21 +17,34 @@ var answers map[string]bool
 var keys []string
 var nonAnswers map[string]bool
 
-func init() {
+func Init() error {
     answers = make(map[string]bool)
     keys = make([]string, 0, answersLineCount)
     nonAnswers = make(map[string]bool)
 
-    loadWordsIntoMap(answers, answersFileName)
-    loadWordsIntoMap(nonAnswers, nonAnswersFileName)
+    if err := loadWordsIntoMap(answers, answersFileName); err != nil {
+        return err
+    }
+
+    if err := loadWordsIntoMap(nonAnswers, nonAnswersFileName); err != nil {
+        return err
+    }
+
+    return nil
 }
 
-func GetWordOfDay() string {
-    durationSinceEpoch := time.Since(time.Unix(0, 0))
-    daysSinceEpoch := int(durationSinceEpoch.Hours() / 24)
+func GetWord(wordIndex int) string {
+    return strings.ToUpper(keys[wordIndex])
+}
 
-    index := daysSinceEpoch % len(keys) 
-    return strings.ToUpper(keys[index])
+func GetWordOfDayIndex() int {
+    referenceTime := time.Date(2000, 1, 1, 0, 0, 0, 0, time.Local)
+    currentTime := time.Now()
+
+    durationSince := currentTime.Sub(referenceTime)
+    daysSince := int(durationSince.Hours() / 24)
+
+    return daysSince % len(keys) 
 }
 
 func IsValidGuess(guess string) bool {
@@ -41,11 +52,7 @@ func IsValidGuess(guess string) bool {
     return answers[guess] || nonAnswers[guess]
 }
 
-func loadWordsIntoMap(theMap map[string]bool, fileName string) {
-    if (InitializationError != nil) {
-        return
-    }
-
+func loadWordsIntoMap(theMap map[string]bool, fileName string) error {
     _, currentFile, _, _ := runtime.Caller(0)
     dir := filepath.Dir(currentFile)
 
@@ -53,8 +60,7 @@ func loadWordsIntoMap(theMap map[string]bool, fileName string) {
 
     file, err := os.Open(filePath); 
     if err != nil {
-        InitializationError = err
-        return 
+        return err
     }
     defer file.Close()
 
@@ -69,6 +75,8 @@ func loadWordsIntoMap(theMap map[string]bool, fileName string) {
     }
 
     if err := scanner.Err(); err != nil {
-        InitializationError = err
+        return err
     }
+
+    return nil
 }

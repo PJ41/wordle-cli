@@ -7,19 +7,26 @@ import (
     "bufio"
 )
 
-type Color int
+const underlined string = "\033[4m"
+
+type Mod int
 
 const (
-    DEFAULT Color = iota
+    DEFAULT Mod = iota
+    UNDERLINED
+    RED
     GREEN
     YELLOW
 )
 
-var colorMap = map[Color]string {
+var modMap = map[Mod]string {
     DEFAULT : "\033[0m",
+    UNDERLINED : "\033[4m",
+    RED : "\033[31m",
     GREEN : "\033[32m",
     YELLOW : "\033[33m",
 }
+
 var writer *bufio.Writer
 var oldState *term.State
 
@@ -45,10 +52,10 @@ func Println(format string, a ...interface{}) {
     Print(format + "\n\r", a...)
 }
 
-func PrintColored(color Color, format string, a ...interface{}) {
-    Print(colorMap[color])
+func PrintModified(mod Mod, format string, a ...interface{}) {
+    Print(modMap[mod])
     Print(format, a...)
-    Print(colorMap[DEFAULT])
+    Print(modMap[DEFAULT])
 }
 
 func Print(format string, a ...interface{}) {
