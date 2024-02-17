@@ -1,6 +1,7 @@
 package data 
 
 import (
+    "runtime"
     "os"
     "path/filepath"
     "errors"
@@ -24,6 +25,8 @@ const (
     metaCount = 2
 
     gameStateCount = constants.MaxAttempts * constants.WordLength
+
+    appName = "wordle_cli"
 )
 
 type data struct {
@@ -36,17 +39,16 @@ var file *os.File
 var userData data;
 
 func Init() error {
-    home := os.Getenv("HOME")
-    if home == "" {
-        return errors.New("Missing HOME environment variable")
+    dataDir, err := getDataDirectory()
+    if err != nil {
+        return err
     }
 
-    dataDir := os.Getenv("WORDLE_CLI_DATA_DIR")
-    if dataDir == "" {
-        dataDir = "/Library/Application Support"
+    if err := os.Mkdir(dataDir, 0755); err != nil && !os.IsExist(err) {
+        return err
     }
 
-    fileName := filepath.Join(home, dataDir, "wordle_cli_user_data.csv")
+    fileName := getFileName(dataDir)
     
     localFile, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0644)
     if err != nil {
@@ -58,6 +60,28 @@ func Init() error {
     if err := parseCsvFile(); err != nil {
         return err
     }
+
+    return nil
+}
+
+func CleanUp() error {
+    dataDir, err := getDataDirectory()
+    if err != nil {
+        return err
+    }
+
+    if _, err := os.Stat(dataDir); os.IsNotExist(err) {
+        return nil
+	} else {
+        fileName := getFileName(dataDir)
+        if err := os.Remove(fileName); err != nil {
+            return err
+        }
+
+        if err := os.Remove(dataDir); err != nil {
+            return err
+        }
+	}
 
     return nil
 }
@@ -206,4 +230,37 @@ func setDefaultUserData() {
         GameMeta: [metaCount]int{},
         GameState: [constants.MaxAttempts][constants.WordLength]rune{},
     }
+}
+
+func getDataDirectory() (string, error) {
+    dataDir := os.Getenv("WORDLE_CLI_DATA_DIR")
+    if dataDir == "" {
+        switch platform := runtime.GOOS; platform {
+        case "darwin":
+            home := os.Getenv("HOME")
+            if home == "" {
+                return "", errors.New("Missing HOME environment variable")
+            }
+            dataDir = filepath.Join(home, "Library", "Application Support")
+        case "windows":
+            dataDir = os.Getenv("APPDATA")
+            if dataDir == "" {
+                return "", errors.New("Missing APPDATA environment variable")
+            }
+        case "linux":
+            home := os.Getenv("HOME")
+            if home == "" {
+                return "", errors.New("Missing HOME environment variable")
+            }
+            dataDir = filepath.Join(home, ".config")
+        default:
+            return "", errors.New("Unsupported OS, must set WORDLE_CLI_DATA_DIR env variable")
+        }
+    }
+
+    return filepath.Join(dataDir, appName), nil
+}
+
+func getFileName(dataDir string) string {
+    return filepath.Join(dataDir, "wordle_cli_user_data.csv")
 }
