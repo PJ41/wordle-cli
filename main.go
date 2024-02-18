@@ -14,10 +14,6 @@ func main() {
     if handleCommandLineArguments() {
         return
     }
-    
-    for _, arg := range os.Args[1:] {
-        fmt.Println(arg)
-    }
 
     if err := dictionary.Init(); err != nil {
         fmt.Println("Error with dicitionary: ", err)
@@ -61,7 +57,8 @@ func handleCommandLineArguments() bool {
 
 func printHelp() {
     fmt.Println(
-`HELP PAGE: wordle cli
+`
+HELP PAGE: wordle cli
 To play, run without any arguments
 
 Command line options:
