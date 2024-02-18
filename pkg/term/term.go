@@ -7,8 +7,6 @@ import (
     "bufio"
 )
 
-const underlined string = "\033[4m"
-
 type Mod int
 
 const (

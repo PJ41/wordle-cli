@@ -243,7 +243,7 @@ func getDataDirectory() (string, error) {
             }
             dataDir = filepath.Join(home, "Library", "Application Support")
         case "windows":
-            dataDir = os.Getenv("APPDATA")
+            dataDir = os.Getenv("LOCALAPPDATA")
             if dataDir == "" {
                 return "", errors.New("Missing APPDATA environment variable")
             }

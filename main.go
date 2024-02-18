@@ -79,7 +79,7 @@ You can customize this behavior by setting the WORDLE_CLI_DATA_DIR env variable
 
 Default data directories:
     Mac -> $HOME/Library/Application Support/
-    Windows -> $APPDATA/
+    Windows -> $LOCALAPPDATA/
     Linux -> $HOME/.config/
 `)
 }

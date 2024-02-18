@@ -10,8 +10,6 @@ import (
     "unicode"
 )
 
-const enterKey rune = 13
-
 var wordIndex int
 var magicWord string
 var gameState [constants.MaxAttempts][constants.WordLength]rune
@@ -219,11 +217,11 @@ func isLetter(r rune) bool {
 }
 
 func isEnter(r rune) bool {
-    return r == enterKey
+    return r == 13
 }
 
 func isDelete(r rune) bool {
-    return r == 127 
+    return r == 127 || r == 8
 }
 
 func printMenu() {
