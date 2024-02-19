@@ -1,10 +1,9 @@
 package dictionary
 
 import (
+    "embed"
     "bufio"
-    "os"
     "path/filepath"
-    "runtime"
     "time"
     "strings"
 )
@@ -12,6 +11,10 @@ import (
 const answersLineCount = 2315
 const answersFileName string = "wordle-answers-shuffled.txt"
 const nonAnswersFileName string = "wordle-non-answers-sorted.txt"
+
+//go:embed words/wordle-answers-shuffled.txt
+//go:embed words/wordle-non-answers-sorted.txt
+var content embed.FS
 
 var answers map[string]bool
 var keys []string
@@ -53,12 +56,9 @@ func IsValidGuess(guess string) bool {
 }
 
 func loadWordsIntoMap(theMap map[string]bool, fileName string) error {
-    _, currentFile, _, _ := runtime.Caller(0)
-    dir := filepath.Dir(currentFile)
+    filePath := filepath.Join("words", fileName)
 
-    filePath := filepath.Join(dir, "words", fileName)
-
-    file, err := os.Open(filePath); 
+    file, err := content.Open(filePath)
     if err != nil {
         return err
     }
